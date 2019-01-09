@@ -25,16 +25,30 @@ import org.apache.dubbo.rpc.proxy.AbstractProxyInvoker;
 import org.apache.dubbo.rpc.proxy.InvokerInvocationHandler;
 
 /**
- * JavaassistRpcProxyFactory
+ * 代理类生成工厂
+ * 使用Javassist 动态生成字节码
  */
 public class JavassistProxyFactory extends AbstractProxyFactory {
 
+    /**
+     * consumer 调用服务 生成代理类  默认不是泛化调用
+     *
+     */
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getProxy(Invoker<T> invoker, Class<?>[] interfaces) {
         return (T) Proxy.getProxy(interfaces).newInstance(new InvokerInvocationHandler(invoker));
     }
 
+    /**
+     * provider 提供服务 生成包装类 主要为了路由到具体的方法
+     *
+     * @param proxy
+     * @param type
+     * @param url
+     * @param <T>
+     * @return
+     */
     @Override
     public <T> Invoker<T> getInvoker(T proxy, Class<T> type, URL url) {
         // TODO Wrapper cannot handle this scenario correctly: the classname contains '$'

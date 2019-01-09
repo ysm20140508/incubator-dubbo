@@ -33,7 +33,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 
 /**
- * Wrapper.
+ * 包装类  主要用于 方法调用的路由
+ * 动态生成Wrapper子类
+ * 为了防止频繁反射造成性能消耗  每个Class对应的Wrapper子类 都会缓存起来
  */
 public abstract class Wrapper {
     private static final Map<Class<?>, Wrapper> WRAPPER_MAP = new ConcurrentHashMap<Class<?>, Wrapper>(); //class wrapper map
@@ -104,6 +106,9 @@ public abstract class Wrapper {
      * @return Wrapper instance(not null).
      */
     public static Wrapper getWrapper(Class<?> c) {
+        /**
+         * 如果是动态生成的类  则获取父类
+         */
         while (ClassGenerator.isDynamicClass(c)) // can not wrapper on dynamic class.
         {
             c = c.getSuperclass();
@@ -113,6 +118,10 @@ public abstract class Wrapper {
             return OBJECT_WRAPPER;
         }
 
+        /**
+         * 从缓存中获取包装类
+         * 如果为空  则重新构造一个
+         */
         Wrapper ret = WRAPPER_MAP.get(c);
         if (ret == null) {
             ret = makeWrapper(c);
@@ -121,6 +130,60 @@ public abstract class Wrapper {
         return ret;
     }
 
+    /**
+     * c1
+     * public void setPropertyValue(Object o,String n, Object v){
+     * className w ;
+     * try{
+     * w = (className)$1;
+     * }catch(throwable e){
+     * throw new IllegalArgumentException(e);
+     * }
+     * <p>
+     * for(fileds filed){
+     * if( $2.equals(filedName) )
+     * w.field = $3 ;
+     * return;
+     * }
+     * }
+     * <p>
+     * c2
+     * public void getPropertyValue(Object o,String n){
+     * classname w ;
+     * try{
+     * w = (className)$1;
+     * }catch(throwable e){
+     * throw new IllegalArgumentException(e);
+     * }
+     * for(Field file){
+     * if($2.equals(fieldName)){
+     * return  ($w)w.fieldName;
+     * }
+     * }
+     * <p>
+     * }
+     * <p>
+     * c3
+     * public void invokeMethod(Object o, String n, Class[] p, Object[] v) throws InvocationTargetException{
+     * className w ;
+     * try{
+     * w=(className)$1;
+     * }catch(throwable e){
+     * throw new IllegalArgumentException(e);
+     * }
+     * <p>
+     * for(Method method){
+     * if(methodName.equals( $2 )
+     * && $3.length ==  methodParameterTypes.length){
+     * w.method(ParameterType);
+     * return null;
+     * }
+     * }
+     * }
+     *
+     * @param c
+     * @return
+     */
     private static Wrapper makeWrapper(Class<?> c) {
         if (c.isPrimitive()) {
             throw new IllegalArgumentException("Can not create wrapper for primitive type: " + c);
@@ -142,7 +205,9 @@ public abstract class Wrapper {
         List<String> mns = new ArrayList<String>(); // method names.
         List<String> dmns = new ArrayList<String>(); // declaring method names.
 
-        // get all public field.
+        /**
+         * 遍历类 所以得域
+         */
         for (Field f : c.getFields()) {
             String fn = f.getName();
             Class<?> ft = f.getType();
@@ -161,6 +226,9 @@ public abstract class Wrapper {
         if (hasMethod) {
             c3.append(" try{");
         }
+        /**
+         * 遍历类的所以的方法
+         */
         for (Method m : methods) {
             if (m.getDeclaringClass() == Object.class) //ignore Object's method.
             {

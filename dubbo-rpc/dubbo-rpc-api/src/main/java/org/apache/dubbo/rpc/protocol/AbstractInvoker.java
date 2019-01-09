@@ -38,7 +38,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * AbstractInvoker.
+ * consumer端使用  触发网络协议的地方
+ * Invoker抽象类
+ * 主要工作: 额外参数及异步参数 设置到Invocation对象
+ * 子类完成调用方式结果区分及具体协议实现
  */
 public abstract class AbstractInvoker<T> implements Invoker<T> {
 

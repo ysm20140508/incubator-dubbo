@@ -32,46 +32,87 @@ public abstract class AbstractServiceConfig extends AbstractInterfaceConfig {
 
     private static final long serialVersionUID = 1L;
 
-    // version
+    /**
+     * 服务版本
+     */
     protected String version;
 
-    // group
+    /**
+     * 服务分组
+     */
     protected String group;
 
-    // whether the service is deprecated
+    /**
+     * 服务是否过期
+     */
     protected Boolean deprecated;
 
-    // delay service exporting
+    /**
+     * -1 不延迟
+     * *  延迟
+     */
     protected Integer delay;
 
-    // whether to export the service
+    /**
+     * 是否输出
+     */
     protected Boolean export;
 
-    // weight
+    /**
+     * 权重
+     */
     protected Integer weight;
 
-    // document center
+    /**
+     * 文档地址
+     */
     protected String document;
 
-    // whether to register as a dynamic service or not on register center
+    /**
+     * 服务是否动态注册，如果设为false，注册后将显示后disable状态，需人工启用，
+     * 并且服务提供者停止时，也不会自动取消册，需人工禁用
+     */
     protected Boolean dynamic;
 
-    // whether to use token
+    /**
+     * 令牌验证，为空表示不开启，
+     * 如果为true，表示随机生成动态令牌，否则使用静态令牌，
+     * 令牌的作用是防止消费者绕过注册中心直接访问,保证注册中心的授权功能有效，如果使用点对点调用，需关闭令牌功能
+     */
     protected String token;
 
-    // access log
+    /**
+     * 设为true，将向logger中输出访问日志，也可填写访问日志文件路径，直接把访问日志输出到指定文件
+     */
     protected String accesslog;
+    /**
+     * 协议配置
+     */
     protected List<ProtocolConfig> protocols;
+    /**
+     * 协议编号
+     */
     protected String protocolIds;
-    // provider tag
+    /**
+     * 服务提供者
+     */
     protected String tag;
-    // max allowed execute times
+    /**
+     * 服务提供者每服务每方法最大可并行执行请求数
+     */
     private Integer executes;
-    // whether to register
+    /**
+     * 该协议的服务是否注册到注册中心
+     */
     private Boolean register;
-    // warm up period
+    /**
+     * 预热
+     */
     private Integer warmup;
-    // serialization
+    /**
+     * 协议序列化方式，当协议支持多种序列化方式时使用，
+     * 比如：dubbo协议的dubbo,hessian2,java,compactedjava，以及http协议的json等
+     */
     private String serialization;
 
     public String getVersion() {

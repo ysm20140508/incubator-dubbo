@@ -40,73 +40,117 @@ public class ProviderConfig extends AbstractServiceConfig {
 
     // ======== protocol default values, it'll take effect when protocol's attributes are not set ========
 
-    // service IP addresses (used when there are multiple network cards available)
+    /**
+     * ip
+     */
     private String host;
 
-    // service port
+    /**
+     * 端口号
+     */
     private Integer port;
 
-    // context path
+    /**
+     * 上下文路径
+     */
     private String contextpath;
 
-    // thread pool
+    /**
+     * 线程池
+     */
     private String threadpool;
 
-    // thread pool size (fixed size)
+    /**
+     * 线程池固定大小
+     */
     private Integer threads;
 
-    // IO thread pool size (fixed size)
+    /**
+     * Io线程池固定大小
+     */
     private Integer iothreads;
 
-    // thread pool queue length
+    /**
+     * 线程池队列大小
+     */
     private Integer queues;
 
-    // max acceptable connections
+    /**
+     * 最大连接数
+     */
     private Integer accepts;
 
-    // protocol codec
+    /**
+     * 协议编码器
+     */
     private String codec;
 
-    // charset
+    /**
+     * 字符集
+     */
     private String charset;
 
-    // payload max length
+    /**
+     * 有效负载最大值
+     */
     private Integer payload;
 
-    // buffer size
+    /**
+     * 缓存区大小
+     */
     private Integer buffer;
 
-    // transporter
+    /**
+     * 传输类
+     */
     private String transporter;
 
-    // how information gets exchanged
+    /**
+     * 交换器
+     */
     private String exchanger;
 
-    // thread dispatching mode
+    /**
+     * 线程分发模式
+     */
     private String dispatcher;
 
     // networker
     private String networker;
 
-    // server impl
+    /**
+     * 服务实现类
+     */
     private String server;
 
-    // client impl
+    /**
+     * 客户端实现类
+     */
     private String client;
 
-    // supported telnet commands, separated with comma.
+    /**
+     * telnet 命令行支持
+     */
     private String telnet;
 
-    // command line prompt
+    /**
+     * 命令行支持
+     */
     private String prompt;
 
-    // status check
+    /**
+     * 状态检查
+     */
     private String status;
 
-    // wait time when stop
+    /**
+     * 等待时间
+     */
     private Integer wait;
 
-    // if it's default
+    /**
+     * 是否默认
+     */
     private Boolean isDefault;
 
     @Deprecated

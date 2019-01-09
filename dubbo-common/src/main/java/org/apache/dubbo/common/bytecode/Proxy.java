@@ -34,9 +34,26 @@ import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Proxy.
+ *
+ * 通过javassist动态字节码 生成interface实现类 重写了每个方法
+ * 方法代码
+ * <p>
+ * Object[] args = new Object[num] ;
+ * for  args[j]=($w)$(j+1);  给数组赋值
+ * Object ret = handler.invoke(this,method,args)
+ * return ret ;
+ * <p>
+ * 增加 域 构造器
+ * public static java.lang.reflect.Method[] methods;
+ * private InvocationHandler handler;
+ * constructor(InvocationHandler handler){
+ * handler = $1;
+ * }
+ * constructor(){
+ * <p>
+ *
+ * }
  */
-
 public abstract class Proxy {
     public static final InvocationHandler RETURN_NULL_INVOKER = new InvocationHandler() {
         @Override
@@ -60,27 +77,30 @@ public abstract class Proxy {
     }
 
     /**
-     * Get proxy.
+     * 获取代理类
      *
-     * @param ics interface class array.
-     * @return Proxy instance.
+     * @param ics
+     * @return
      */
     public static Proxy getProxy(Class<?>... ics) {
         return getProxy(ClassHelper.getClassLoader(Proxy.class), ics);
     }
 
     /**
-     * Get proxy.
+     * 获取代理类
      *
-     * @param cl  class loader.
-     * @param ics interface class array.
-     * @return Proxy instance.
+     * @param cl
+     * @param ics
+     * @return
      */
     public static Proxy getProxy(ClassLoader cl, Class<?>... ics) {
         if (ics.length > 65535) {
             throw new IllegalArgumentException("interface limit exceeded");
         }
 
+        /**
+         *  遍历class  并且用类名拼接a1;a2;a3;格式字符串
+         */
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < ics.length; i++) {
             String itf = ics[i].getName();
@@ -100,11 +120,11 @@ public abstract class Proxy {
 
             sb.append(itf).append(';');
         }
-
-        // use interface class name list as key.
         String key = sb.toString();
 
-        // get cache by class loader.
+        /**
+         * 根据类加载器 获取缓存
+         */
         Map<String, Object> cache;
         synchronized (ProxyCacheMap) {
             cache = ProxyCacheMap.get(cl);
@@ -114,6 +134,9 @@ public abstract class Proxy {
             }
         }
 
+        /**
+         * 根据key 从缓存中 获取代理类
+         */
         Proxy proxy = null;
         synchronized (cache) {
             do {
@@ -124,12 +147,17 @@ public abstract class Proxy {
                         return proxy;
                     }
                 }
-
+                /**
+                 * 如果缓存中 不为空 并且为默认值 则等待
+                 */
                 if (value == PendingGenerationMarker) {
                     try {
                         cache.wait();
                     } catch (InterruptedException e) {
                     }
+                    /**
+                     * 第一次为空的情况  缓存中 设置默认值
+                     */
                 } else {
                     cache.put(key, PendingGenerationMarker);
                     break;
@@ -137,7 +165,12 @@ public abstract class Proxy {
             }
             while (true);
         }
-
+        /**
+         * 生成代理类
+         */
+        /**
+         * 当前代理类总数
+         */
         long id = PROXY_CLASS_COUNTER.getAndIncrement();
         String pkg = null;
         ClassGenerator ccp = null, ccm = null;
@@ -148,6 +181,9 @@ public abstract class Proxy {
             List<Method> methods = new ArrayList<Method>();
 
             for (int i = 0; i < ics.length; i++) {
+                /**
+                 * 如果接口不是public  则获取包名
+                 */
                 if (!Modifier.isPublic(ics[i].getModifiers())) {
                     String npkg = ics[i].getPackage().getName();
                     if (pkg == null) {
@@ -159,7 +195,13 @@ public abstract class Proxy {
                     }
                 }
                 ccp.addInterface(ics[i]);
-
+                /**
+                 * 遍历每个方法 并且在每个方法中插入 一段代码
+                 *  Object[] args = new Object[num] ;
+                 *  for  args[j]=($w)$(j+1);  给数组赋值
+                 *  Object ret = handler.invoke(this,methods[method方法总数+1],args)
+                 *  return ret ;
+                 */
                 for (Method method : ics[i].getMethods()) {
                     String desc = ReflectUtils.getDesc(method);
                     if (worked.contains(desc)) {
@@ -171,6 +213,13 @@ public abstract class Proxy {
                     Class<?> rt = method.getReturnType();
                     Class<?>[] pts = method.getParameterTypes();
 
+                    /**
+                     *
+                     * Object[] args = new Object[num] ;
+                     * for  args[j]=($w)$(j+1);  给数组赋值
+                     * Object ret = handler.invoke(this,methods[],args)
+                     * return ret ;
+                     */
                     StringBuilder code = new StringBuilder("Object[] args = new Object[").append(pts.length).append("];");
                     for (int j = 0; j < pts.length; j++) {
                         code.append(" args[").append(j).append("] = ($w)$").append(j + 1).append(";");
@@ -188,8 +237,19 @@ public abstract class Proxy {
             if (pkg == null) {
                 pkg = PACKAGE_NAME;
             }
-
-            // create ProxyInstance class.
+            /**
+             * 生成service代理类
+             * 在service本身已有的field method  增加
+             * public static java.lang.reflect.Method[] methods;
+             * private InvocationHandler handler;
+             * constructor(InvocationHandler handler){
+             *    handler = $1;
+             * }
+             * constructor(){
+             *
+             * }
+             *
+             */
             String pcn = pkg + ".proxy" + id;
             ccp.setClassName(pcn);
             ccp.addField("public static java.lang.reflect.Method[] methods;");
@@ -198,8 +258,13 @@ public abstract class Proxy {
             ccp.addDefaultConstructor();
             Class<?> clazz = ccp.toClass();
             clazz.getField("methods").set(null, methods.toArray(new Method[0]));
-
-            // create Proxy class.
+            /**
+             * 生成Proxy 实现类
+             * 在Proxy本身已有的field method 增加
+             * public Object newInstance(InvocationHandler h){
+             *   return new pcn(h);
+             * }
+             */
             String fcn = Proxy.class.getName() + id;
             ccm = ClassGenerator.newInstance(cl);
             ccm.setClassName(fcn);
@@ -213,13 +278,18 @@ public abstract class Proxy {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         } finally {
-            // release ClassGenerator
+            /**
+             * 释放代理类
+             */
             if (ccp != null) {
                 ccp.release();
             }
             if (ccm != null) {
                 ccm.release();
             }
+            /**
+             * 设置缓存
+             */
             synchronized (cache) {
                 if (proxy == null) {
                     cache.remove(key);

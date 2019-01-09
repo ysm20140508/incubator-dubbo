@@ -57,58 +57,111 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
 
     private static final long serialVersionUID = -1559314110797223229L;
 
-    // local impl class name for the service interface
+    /**
+     * 服务接口 本地实现
+     */
     protected String local;
 
-    // local stub class name for the service interface
+    /**
+     * 服务接口 本地存根
+     */
     protected String stub;
 
-    // service monitor
+    /**
+     * 监控服务配置
+     */
     protected MonitorConfig monitor;
 
-    // proxy type
+    /**
+     * 消费服务代理类生成的方式
+     * jsk
+     * javassit
+     */
     protected String proxy;
 
-    // cluster type
+    /**
+     * 集群容错配置
+     * Failfast Cluster
+     * Failsafe Cluster
+     * Failback Cluster
+     * Forking Cluster
+     * Broadcast Cluster
+     */
     protected String cluster;
 
-    // filter
+    /**
+     * 服务提供方远程调用过程拦截器名称，多个名称用逗号分隔
+     */
     protected String filter;
 
-    // listener
+    /**
+     * 服务提供方导出服务监听器名称，多个名称用逗号分隔
+     */
     protected String listener;
 
-    // owner
+    /**
+     * 服务负责人，用于服务治理，请填写负责人公司邮箱前缀
+     */
     protected String owner;
 
-    // connection limits, 0 means shared connection, otherwise it defines the connections delegated to the
-    // current service
+    /**
+     * 对每个提供者的最大连接数，rmi、http、hessian等短连接协议表示限制连接数，dubbo等长连接协表示建立的长连接个数
+     */
     protected Integer connections;
 
-    // layer
+    /**
+     * 服务提供者所在的分层。如：biz、dao、intl:web、china:acton。
+     */
     protected String layer;
 
-    // application info
+    /**
+     * 应用信息配置
+     */
     protected ApplicationConfig application;
 
-    // module info
+    /**
+     * 模块信息配置
+     */
     protected ModuleConfig module;
 
-    // registry centers
+    /**
+     * 注册中心配置
+     */
     protected List<RegistryConfig> registries;
 
+    /**
+     * 注册中心id
+     */
     protected String registryIds;
 
-    // connection events
+    /**
+     * 连接事件
+     */
     protected String onconnect;
 
-    // disconnection events
+    /**
+     * 断开连接事件
+     */
     protected String ondisconnect;
+
+    /**
+     * 数据上报配置
+     */
     protected MetadataReportConfig metadataReportConfig;
+
+    /**
+     * 注册数据配置
+     */
     protected RegistryDataConfig registryDataConfig;
-    // callback limits
+
+    /**
+     * 回调设置最大个数
+     */
     private Integer callbacks;
-    // the scope for referring/exporting a service, if it's local, it means searching in current JVM only.
+    /**
+     * remote  引用远程服务
+     * local   引用本地JVM服务
+     */
     private String scope;
 
     protected void checkRegistry() {
@@ -193,6 +246,12 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         }
     }
 
+    /**
+     * 加载注册协议
+     *
+     * @param provider
+     * @return
+     */
     protected List<URL> loadRegistries(boolean provider) {
         // check && override if necessary
         checkRegistry();
@@ -386,6 +445,9 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         }
     }
 
+    /**
+     * 注册Id  转变为 注册中心
+     */
     private void convertRegistryIdsToRegistries() {
         if (StringUtils.isEmpty(registryIds) && (registries == null || registries.isEmpty())) {
             Set<String> configedRegistries = new HashSet<>();
@@ -419,12 +481,14 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                         .size() + " registries!");
             }
         }
-
     }
 
+    /**
+     * 向后兼容
+     * <p>
+     * dubbo.registry.address 已经被剔除了
+     */
     private void loadRegistriesFromBackwardConfig() {
-        // for backward compatibility
-        // -Ddubbo.registry.address is now deprecated.
         if (registries == null || registries.isEmpty()) {
             String address = ConfigUtils.getProperty("dubbo.registry.address");
             if (address != null && address.length() > 0) {

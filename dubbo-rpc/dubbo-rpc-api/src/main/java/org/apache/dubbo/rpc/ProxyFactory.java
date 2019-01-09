@@ -22,13 +22,14 @@ import org.apache.dubbo.common.extension.Adaptive;
 import org.apache.dubbo.common.extension.SPI;
 
 /**
- * ProxyFactory. (API/SPI, Singleton, ThreadSafe)
+ * 代理类
+ * 主要为了: 动态路由到具体的方法
  */
 @SPI("javassist")
 public interface ProxyFactory {
 
     /**
-     * create proxy.
+     * consumer 调用服务 生成代理类 默认不是泛化调用
      *
      * @param invoker
      * @return proxy
@@ -37,7 +38,7 @@ public interface ProxyFactory {
     <T> T getProxy(Invoker<T> invoker) throws RpcException;
 
     /**
-     * create proxy.
+     * consumer 调用服务 生成代理类  是否泛化调用通过参数控制
      *
      * @param invoker
      * @return proxy
@@ -46,7 +47,7 @@ public interface ProxyFactory {
     <T> T getProxy(Invoker<T> invoker, boolean generic) throws RpcException;
 
     /**
-     * create invoker.
+     * provider 提供服务 生成包装类
      *
      * @param <T>
      * @param proxy

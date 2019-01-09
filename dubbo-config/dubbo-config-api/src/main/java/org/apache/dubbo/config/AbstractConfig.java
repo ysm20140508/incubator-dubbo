@@ -77,7 +77,6 @@ public abstract class AbstractConfig implements Serializable {
         legacyProperties.put("dubbo.consumer.retries", "dubbo.service.max.retry.providers");
         legacyProperties.put("dubbo.consumer.check", "dubbo.service.allow.no.provider");
         legacyProperties.put("dubbo.service.url", "dubbo.service.address");
-
         // this is only for compatibility
         DubboShutdownHook.getDubboShutdownHook().register();
     }
@@ -95,6 +94,7 @@ public abstract class AbstractConfig implements Serializable {
         }
         return value;
     }
+
 
     private static String getTagName(Class<?> cls) {
         String tag = cls.getSimpleName();
@@ -402,23 +402,46 @@ public abstract class AbstractConfig implements Serializable {
         }
     }
 
+    /**
+     * 把注解相关属性值 赋值给当前类
+     *
+     * @param annotationClass
+     * @param annotation
+     */
     protected void appendAnnotation(Class<?> annotationClass, Object annotation) {
+        /**
+         * 获取注解类所有Method
+         */
         Method[] methods = annotationClass.getMethods();
         for (Method method : methods) {
+            /**
+             * 声明的类  不是Object
+             * 返回类型  不是void
+             * public  不是静态方法
+             */
             if (method.getDeclaringClass() != Object.class
                     && method.getReturnType() != void.class
                     && method.getParameterTypes().length == 0
                     && Modifier.isPublic(method.getModifiers())
                     && !Modifier.isStatic(method.getModifiers())) {
                 try {
+                    /**
+                     * 这个类的Field
+                     */
                     String property = method.getName();
                     if ("interfaceClass".equals(property) || "interfaceName".equals(property)) {
                         property = "interface";
                     }
                     String setter = "set" + property.substring(0, 1).toUpperCase() + property.substring(1);
                     Object value = method.invoke(annotation);
+                    /**
+                     * 不为空 并且 不是默认值  赋值给本类相应的Filed
+                     */
                     if (value != null && !value.equals(method.getDefaultValue())) {
                         Class<?> parameterType = ReflectUtils.getBoxedClass(method.getReturnType());
+                        /**
+                         * 过滤器、监听器和多个参数  值设置为数组
+                         */
                         if ("filter".equals(property) || "listener".equals(property)) {
                             parameterType = String.class;
                             value = StringUtils.join((String[]) value, ",");
@@ -427,6 +450,9 @@ public abstract class AbstractConfig implements Serializable {
                             value = CollectionUtils.toStringMap((String[]) value);
                         }
                         try {
+                            /**
+                             * 查找对应的set Method
+                             */
                             Method setterMethod = getClass().getMethod(setter, parameterType);
                             setterMethod.invoke(this, value);
                         } catch (NoSuchMethodException e) {
@@ -521,7 +547,7 @@ public abstract class AbstractConfig implements Serializable {
             config.addProperties(getMetaData());
             if (Environment.getInstance().isConfigCenterFirst()) {
                 // The sequence would be: SystemConfiguration -> ExternalConfiguration -> AppExternalConfiguration -> AbstractConfig -> PropertiesConfiguration
-                compositeConfiguration.addConfiguration(3,config);
+                compositeConfiguration.addConfiguration(3, config);
             } else {
                 // The sequence would be: SystemConfiguration -> AbstractConfig -> ExternalConfiguration -> AppExternalConfiguration -> PropertiesConfiguration
                 compositeConfiguration.addConfiguration(1, config);

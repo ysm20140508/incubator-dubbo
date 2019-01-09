@@ -19,7 +19,15 @@ package org.apache.dubbo.rpc;
 import org.apache.dubbo.common.Node;
 
 /**
- * Invoker. (API/SPI, Prototype, ThreadSafe)
+ * 执行唤起的地方
+ *
+ * provider
+ *      触发本地service  执行相应方法的地方
+ *      AbstractProxyInvoker
+ *
+ * consumer
+ *      发起调用远程service  并且根据相应协议进行序列化
+ *      AbstractProxy
  *
  * @see org.apache.dubbo.rpc.Protocol#refer(Class, org.apache.dubbo.common.URL)
  * @see org.apache.dubbo.rpc.InvokerListener

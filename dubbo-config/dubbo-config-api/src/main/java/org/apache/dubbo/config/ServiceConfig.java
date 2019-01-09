@@ -72,26 +72,74 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
     private static final long serialVersionUID = 3033787999037024738L;
 
+    /**
+     * 默认协议类
+     */
     private static final Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getAdaptiveExtension();
 
+    /**
+     * 默认代理工程类
+     */
     private static final ProxyFactory proxyFactory = ExtensionLoader.getExtensionLoader(ProxyFactory.class).getAdaptiveExtension();
 
+    /**
+     * 协议端口号
+     */
     private static final Map<String, Integer> RANDOM_PORT_MAP = new HashMap<String, Integer>();
 
+    /**
+     * 周期性定时任务
+     */
     private static final ScheduledExecutorService delayExportExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("DubboServiceDelayExporter", true));
+
+    /**
+     * URL 列表
+     */
     private final List<URL> urls = new ArrayList<URL>();
+
+    /**
+     * 导出类列表
+     */
     private final List<Exporter<?>> exporters = new ArrayList<Exporter<?>>();
-    // interface type
+
+    /**
+     * 接口名称
+     */
     private String interfaceName;
+
+    /**
+     * 接口类
+     */
     private Class<?> interfaceClass;
-    // reference to interface impl
+
+    /**
+     * 接口实现类
+     */
     private T ref;
-    // service name
+
+    /**
+     * 接口路径
+     */
     private String path;
-    // method configuration
+
+    /**
+     * 方法配置
+     */
     private List<MethodConfig> methods;
+
+    /**
+     * 提供者配置
+     */
     private ProviderConfig provider;
+
+    /**
+     * 提供者id
+     */
     private String providerIds;
+
+    /**
+     * 是否导出
+     */
     private transient volatile boolean exported;
 
     private transient volatile boolean unexported;

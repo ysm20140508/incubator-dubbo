@@ -40,101 +40,162 @@ public class ProtocolConfig extends AbstractConfig {
 
     private static final long serialVersionUID = 6913423882496634749L;
 
-    // protocol name
+    /**
+     * 协议名称
+     */
     private String name;
 
-    // service IP address (when there are multiple network cards available)
+    /**
+     * 协议ip
+     */
     private String host;
 
-    // service port
+    /**
+     * 协议端口号
+     */
     private Integer port;
 
-    // context path
+    /**
+     * 上下文路径
+     */
     private String contextpath;
 
-    // thread pool
+    /**
+     * 线程池
+     */
     private String threadpool;
 
-    // thread pool core thread size
+    /**
+     * 线程池默认大小
+     */
     private Integer corethreads;
 
-    // thread pool size (fixed size)
+    /**
+     * 线程池固定大小
+     */
     private Integer threads;
 
-    // IO thread pool size (fixed size)
+    /**
+     * io线程池固定大小
+     */
     private Integer iothreads;
 
-    // thread pool's queue length
+    /**
+     * 线程池队列大小
+     */
     private Integer queues;
 
-    // max acceptable connections
+    /**
+     * 最大的接受链接
+     */
     private Integer accepts;
 
-    // protocol codec
+    /**
+     * 协议编码类
+     */
     private String codec;
 
-    // serialization
+    /**
+     * 协议序列化
+     */
     private String serialization;
 
-    // charset
+    /**
+     * 字符集
+     */
     private String charset;
 
-    // payload max length
+    /**
+     * 有效负载最大值
+     */
     private Integer payload;
 
-    // buffer size
+    /**
+     * 缓冲区最大值
+     */
     private Integer buffer;
 
-    // heartbeat interval
+    /**
+     * 心态间隔
+     */
     private Integer heartbeat;
 
-    // access log
+    /**
+     * 接入日志
+     */
     private String accesslog;
 
-    // transfort
+    /**
+     * 传输类
+     */
     private String transporter;
 
-    // how information is exchanged
+    /**
+     * 交换器
+     */
     private String exchanger;
 
-    // thread dispatch mode
+    /**
+     * 线程分发模式
+     */
     private String dispatcher;
 
     // networker
     private String networker;
 
-    // sever impl
+    /**
+     * 服务
+     */
     private String server;
 
-    // client impl
+    /**
+     * 客服端
+     */
     private String client;
 
-    // supported telnet commands, separated with comma.
+    /**
+     * telnet 命令行
+     */
     private String telnet;
 
-    // command line prompt
+    /**
+     * 命令行
+     */
     private String prompt;
 
-    // status check
+    /**
+     * 状态检查
+     */
     private String status;
 
-    // whether to register
+    /**
+     * 是否注册到注册中心
+     */
     private Boolean register;
 
-    // parameters
-    // 是否长连接
-    // TODO add this to provider config
+    /**
+     * 长连接
+     */
     private Boolean keepAlive;
 
-    // TODO add this to provider config
+    /**
+     * 优化
+     */
     private String optimizer;
 
+    /**
+     * 延期
+     */
     private String extension;
 
-    // parameters
+    /**
+     * 参数
+     */
     private Map<String, String> parameters;
 
-    // if it's default
+    /**
+     * 是否默认
+     */
     private Boolean isDefault;
 
     public ProtocolConfig() {

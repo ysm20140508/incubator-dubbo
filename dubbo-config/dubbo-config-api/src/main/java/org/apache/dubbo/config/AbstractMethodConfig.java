@@ -31,41 +31,66 @@ public abstract class AbstractMethodConfig extends AbstractConfig {
 
     private static final long serialVersionUID = 1L;
 
-    // timeout for remote invocation in milliseconds
+    /**
+     * 远程调用超时时间
+     */
     protected Integer timeout;
 
-    // retry times
+    /**
+     * 重试次数
+     */
     protected Integer retries;
 
-    // max concurrent invocations
+    /**
+     * 最大调用并发数
+     */
     protected Integer actives;
 
-    // load balance
+    /**
+     * 负载均衡
+     * random 随机
+     * roundRobin 轮询
+     * leastActive 最少活跃调用
+     */
     protected String loadbalance;
 
-    // whether to async
+    /**
+     * 异步
+     */
     protected Boolean async;
 
-    // whether to ack async-sent
+    /**
+     * ack 确认报文 异步发送
+     */
     protected Boolean sent;
 
-    // the name of mock class which gets called when a service fails to execute
+    /**
+     * 模拟
+     */
     protected String mock;
 
-    // merger
+    /**
+     * 合并
+     */
     protected String merger;
 
-    // cache
+    /**
+     * 缓存
+     */
     protected String cache;
 
-    // validation
+    /**
+     * 验证
+     */
     protected String validation;
 
-    // customized parameters
+    /**
+     * 自定义参数
+     */
     protected Map<String, String> parameters;
 
     /**
-     * forks for forking cluster
+     * 设置并行最大服务器数
      */
     protected Integer forks;
 

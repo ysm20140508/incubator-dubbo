@@ -32,7 +32,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * InvokerWrapper
+ * provider端使用  执行本地service 方法  并把结果返回回去
+ * Invoker 抽象类
+ * 主要封装 调用结果集返回
+ * 具体怎么调用留给了子类
  */
 public abstract class AbstractProxyInvoker<T> implements Invoker<T> {
     Logger logger = LoggerFactory.getLogger(AbstractProxyInvoker.class);
